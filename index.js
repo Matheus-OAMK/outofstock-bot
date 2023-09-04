@@ -34,6 +34,9 @@ async function sendTelegramMessage(message) {
 }
 
 
+const productInStock = 'https://www.jimms.fi/fi/Product/Show/187728/tuf-rtx4070ti-o12g-gaming/asus-geforce-rtx-4070-ti-tuf-gaming-oc-edition-naytonohjain-12gb-gddr6x'
+const productOutOfStock = 'https://www.jimms.fi/fi/Product/Show/186311/49nxm5md6dsk/kfa2-geforce-rtx-4090-sg-1-click-oc-naytonohjain-24gb-gddr6x'
+
 
 async function checkStock() {
   // Launch the browser and open a new blank page
@@ -41,7 +44,7 @@ async function checkStock() {
   const page = await browser.newPage();
   try {
     await page.goto(
-      'https://www.jimms.fi/fi/Product/Show/186311/49nxm5md6dsk/kfa2-geforce-rtx-4090-sg-1-click-oc-naytonohjain-24gb-gddr6x'
+      productInStock
     );
 
     const availabilityElement = await page.$('.availability-product');
@@ -52,10 +55,9 @@ async function checkStock() {
       );
 
       if (availabilityText.includes('Ei varastossa')) {
-        sendTelegramMessage('Still out of stock')
-        console.log('Still out of stock');
+        sendTelegramMessage('Item is out of stock =(')
       } else {
-        console.log('ITEM IS IN STOCK LETS GOOOOOOO!!!!');
+        sendTelegramMessage('ITEM IS IN STOCK GET YOUR CARD OUT LETS GO!!')
       }
     }
   } catch (error) {}
