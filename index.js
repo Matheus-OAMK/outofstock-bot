@@ -1,11 +1,18 @@
 import puppeteer from 'puppeteer';
 import fetch from 'node-fetch';
-import {config} from 'dotenv';
+import { config } from 'dotenv';
 
 config();
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN 
-const CHAT_ID = process.env.CHAT_ID 
+//replace this with your actual data
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const CHAT_ID = process.env.CHAT_ID;
+
+const interval = 5000; // replace for desired interval time in ms
+
+//replace this with the url of the item you want to check
+const productUrl =
+  'https://www.jimms.fi/fi/Product/Show/186311/49nxm5md6dsk/kfa2-geforce-rtx-4090-sg-1-click-oc-naytonohjain-24gb-gddr6x';
 
 async function sendTelegramMessage(message) {
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
@@ -33,19 +40,12 @@ async function sendTelegramMessage(message) {
   }
 }
 
-
-const productInStock = 'https://www.jimms.fi/fi/Product/Show/187728/tuf-rtx4070ti-o12g-gaming/asus-geforce-rtx-4070-ti-tuf-gaming-oc-edition-naytonohjain-12gb-gddr6x'
-const productOutOfStock = 'https://www.jimms.fi/fi/Product/Show/186311/49nxm5md6dsk/kfa2-geforce-rtx-4090-sg-1-click-oc-naytonohjain-24gb-gddr6x'
-
-
 async function checkStock() {
   // Launch the browser and open a new blank page
-  const browser = await puppeteer.launch({headless: 'new',});
+  const browser = await puppeteer.launch({ headless: 'new' });
   const page = await browser.newPage();
   try {
-    await page.goto(
-      productInStock
-    );
+    await page.goto(productUrl);
 
     const availabilityElement = await page.$('.availability-product');
     if (availabilityElement) {
@@ -55,9 +55,11 @@ async function checkStock() {
       );
 
       if (availabilityText.includes('Ei varastossa')) {
-        sendTelegramMessage('Item is out of stock =(')
+        sendTelegramMessage('Item is out of stock =('); //comment this out if you dont want messages when item is out of stock
+        console.log('Item is out of stock =(');
       } else {
-        sendTelegramMessage('ITEM IS IN STOCK GET YOUR CARD OUT LETS GO!!')
+        sendTelegramMessage('ITEM IS IN STOCK GET YOUR CARD OUT LETS GO!!');
+        console.log('ITEM IS IN STOCK GET YOUR CARD OUT LETS GO!!');
       }
     }
   } catch (error) {}
@@ -65,4 +67,4 @@ async function checkStock() {
   await browser.close();
 }
 
-setInterval(checkStock, 5000)
+setInterval(checkStock, interval);
